@@ -1,0 +1,117 @@
+La respuesta de la API en casos de error es siempre
+{ msg: "Mensaje descriptivo",
+  codErr: codigoDeError}
+
+misma estructura para codigos de notificacion solo que ahi es cod en vez de codErr.
+
+Codigos de error de la API socialAsync
+Create user se espera un json con nombre string, username string, contraseña string, devuelve un json con msg string (usuario creado) y un campo usuario el cual  es un objeto con campos username string y nombre string
+102: usuario ya existe ( no se puede crear ) (/register post) 
+
+General
+101: formato json invalido (general) 
+100: cmapos insuficientes en la solicitud
+105: JWT no valido
+103: no se encuentra usuario
+106: no existe un post con el id especificado
+107: no existe un comentario con el id especificado
+108: Ya existe una soliciitud de amistad pendiente
+109: no se envia la solicitud porque ya son amigos
+110: "No se encuentra la solicitud de amistad indicada o ya esta rechazada/aceptada"
+111: "La persona a la que intentas enviarle solicitud ya rechazo una solicitud previa"
+112: "Action debe ser true o false"
+113: no puedes eliminar a alguien que no es tu amigo
+114: no puedes enviar una solicitud de amistad a ti mismo
+115: no puedes ver los posts de la persona porque no sos su amigo
+
+Codigos de notificacion (no error):
+200: No se envio la solicitud de amistad porque ya tenias uno pendiente de la persona, ahora ya son amigos.
+
+Login
+se espera un json con username string, contraseña string, devuelve un json con msg string (login correcto) y el jwt que dentro tiene el username.
+104: contraseña no valida (/login post). 
+
+post
+/post espera un json con el token brindado en login junto con el content string, devuelve 
+{
+    "msg": "Post creado correctamente",
+    "post": {
+        "username": "NicolasD",
+        "content": "Hola gente, este es el segundo post en socialAsync :D!",
+        "estado": true,
+        "_id": "69b9a949a809f02b6e4195f5",
+        "createdAt": "2026-03-17T19:19:37.300Z",
+        "updatedAt": "2026-03-17T19:19:37.300Z",
+        "__v": 0
+    }
+}
+
+getUserPosts
+app.get("/posts/:username", getUserPosts); ademas se espera que el front vaya indicando pagina al hacer scroll tal que ?page=1 es decir algo como /posts/pepito?page=1 y asi, se iran enviando los posts de a 15 posts por pagina.
+
+Recibe como param el username, y en los headers.authorization va el token del usuario
+
+createComment
+app.post("/comment", createComment); recibe en el body un objeto con token string, content string y postId Types.ObjectId 
+
+deletePost
+app.delete("/post/:idPost", deletePost);
+recibe en el header.authorization el token, y como param el id del post que se desea borrar. (se borraran los comentarios tambien asociados). // soft delete 
+
+deleteComment
+app.delete("/comment/:commentId", deleteComment);
+recibe en el header.auhtorization el token, y como param el id del comentario que se desea borrar. // soft delete
+
+getComments 
+app.get("/comment/:postId", getComments); recibe en el header el jwt del usuario, y como param el postId sobre el cual quiere obtener los comentarios
+Si el post no tenia comentarios devuelve un array vacio, no indica error ya que no se considera como tal un error.
+
+requestFriend
+app.post("/friend", requestFriend); recibe en el body el username de la persona que queres agregar, y el token.
+La amistad otorga el permiso de ver los posts de la persona y comentar en ellos, la solicitud debe ser aprobada por la persona a la que se lo enviaste.
+
+getFriendRequest
+app.get("/friend", getFriendRequests); recibe el token del usuario en headers.authorization auth bearer, devuelve un objeto con propiedad friendRequests donde estan todas las solicitudes de amistad pendientes
+
+acceptoOrRejectFriendshipRequestStatus
+app.post("/friend/reject",acceptOrRejectFriendshipRequest); recibe en el body el token del usuario, el nombre de usuario (username) del emisor de la solicitud, y le accion (action) en true si va a aceptar, o en false si va a rechazar, es un boolean.
+Devuelve el estado de la amistad una vez actualizado propiedad newFriendship
+
+deleteFriendship
+app.delete("/friend/:deleteUsername", deleteFriendship); recibe por param el username de la persona a la que queres borrar y por header authorization bearer el token.
+Devuelve una copia de la amistad eliminada de la BD:
+res.json({
+    msg:"Eliminado",
+    deletedFriendship
+  });
+
+
+getFriends
+app.get("/friend/list", getFriends); recibe en header.authorization el jwt del usuario, devuelve un objeto con una propiedad friendList que tiene todas las relaciones de amistad de la persona. (tene en cuenta que puede ser que su amigo este en recieverUsername o emitterUsername depende de quien haya enviado la solicitud..)
+
+getUserFeed
+app.get("/feed", getUserFeed); recibe en header.auhtorization bearer el jwt del usuario, opcionalmente puede indicarse el numero de pagina del feed, se envian 15 posts or pagina ejemmplo localhost:8080/feed?page=1 si no se envia por defecto es la pagina 1
+
+getUsers
+app.get("/search", getUsers); recibe el token del usuario en header.authorization bearer y por query param el username tipo /search?username=Pepe, no es necesario que sea completo, devuelve los resultados aproximados de la base de usuarios.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

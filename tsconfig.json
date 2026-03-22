@@ -1,0 +1,18 @@
+{
+  // Visit https://aka.ms/tsconfig to read more about this file
+  "compilerOptions": {
+    "outDir": "./dist",
+
+    "module": "commonjs",
+    "target": "es6",
+
+    // Other Outputs
+    "sourceMap": true,
+    "esModuleInterop": true,
+
+    // Recommended Options
+    "strict": true,
+    "types": ["node"]
+  },
+  "exclude": ["node_modules", "dist"]
+}
