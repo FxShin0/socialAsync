@@ -661,7 +661,7 @@ export const getFriends = async (req: Request, res: Response) => {
   try {
     decodificado = jwt.verify(token, CLAVE) as IJWTPayload;
   } catch (err) {
-    res.json({
+    res.status(401).json({
       msg: "Token no valido",
       err,
     });
