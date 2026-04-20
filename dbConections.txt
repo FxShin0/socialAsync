@@ -1,5 +1,0 @@
-
-nicolasdiazfx_db_user
-WCYSifNBOASXJHWs
-
-mongodb+srv://nicolasdiazfx_db_user:WCYSifNBOASXJHWs@socialasync.wa1eici.mongodb.net/
