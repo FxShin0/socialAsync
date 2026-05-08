@@ -532,6 +532,7 @@ export const getFriendRequests = async (req: Request, res: Response) => {
   const friendRequests = await Friendship.find({
     recieverUsername: decodificado.username,
     estado: false,
+    isRejected: false,
   });
 
   res.json({
