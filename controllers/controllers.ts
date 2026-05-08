@@ -365,6 +365,14 @@ export const getComments = async (req: Request, res: Response) => {
     return;
   }
 
+  if (!Types.ObjectId.isValid(postId as string)) {
+    res.status(400).json({
+      msg: "Formato de postId invalido",
+      codErr: 116,
+    });
+    return;
+  }
+
   let existePost = await Post.exists({
     _id: new Types.ObjectId(postId as string),
     estado: true,
@@ -431,7 +439,7 @@ export const requestFriend = async (req: Request, res: Response) => {
   });
 
   if (existeSolicitudPendiente) {
-    res.status(400).json({
+    res.status(409).json({
       msg: "Ya existe una solicitud de amistad pendiente",
       codErr: 108,
     });
