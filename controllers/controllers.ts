@@ -27,7 +27,7 @@ export const createUser = async (req: Request, res: Response) => {
   }
   const existe = await User.exists({ username: username });
   if (existe) {
-    res.status(400).json({
+    res.status(409).json({
       msg: "Usuario ya existe",
       codErr: 102,
     });
