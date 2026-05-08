@@ -23,6 +23,7 @@ General
 113: no puedes eliminar a alguien que no es tu amigo
 114: no puedes enviar una solicitud de amistad a ti mismo
 115: no puedes ver los posts de la persona porque no sos su amigo
+116: Formato invalido de postId
 
 Codigos de notificacion (no error):
 200: No se envio la solicitud de amistad porque ya tenias uno pendiente de la persona, ahora ya son amigos.

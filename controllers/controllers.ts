@@ -185,10 +185,18 @@ export const createComment = async (req: Request, res: Response) => {
   try {
     decodificado = jwt.verify(token, CLAVE) as IJWTPayload;
   } catch (err) {
-    res.json({
+    res.status(401).json({
       msg: "Token no valido",
       err,
       codErr: 105,
+    });
+    return;
+  }
+
+  if (!Types.ObjectId.isValid(postId)) {
+    res.status(400).json({
+      msg: "Formato de postId invalido",
+      codErr: 116,
     });
     return;
   }
