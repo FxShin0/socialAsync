@@ -30,7 +30,7 @@ export const createUser = async (req: Request, res: Response) => {
 
   if (!usernameRegex.test(username)) {
     res.status(400).json({
-      msg: "El username no debe contener espacios ni caracteres especiales ni emojis ni terminar en caracteres de signos.",
+      msg: "El username solo puede contener letras, numeros y guion bajo",
       codErr: 117,
     });
     return;
