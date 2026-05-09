@@ -319,6 +319,14 @@ export const deleteComment = async (req: Request, res: Response) => {
     return;
   }
 
+  if (!Types.ObjectId.isValid(commentId as string)) {
+    res.status(400).json({
+      msg: "Formato de commentId invalido",
+      codErr: 116,
+    });
+    return;
+  }
+
   const existeComentario = await Comment.exists({
     _id: new Types.ObjectId(commentId as string),
     username: decodificado.username,
