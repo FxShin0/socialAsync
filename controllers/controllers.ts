@@ -253,6 +253,14 @@ export const deletePost = async (req: Request, res: Response) => {
     return;
   }
 
+  if (!Types.ObjectId.isValid(postId as string)) {
+    res.status(400).json({
+      msg: "Formato de postId invalido",
+      codErr: 116,
+    });
+    return;
+  }
+
   const existePost = await Post.exists({
     _id: new Types.ObjectId(postId as string),
     estado: true,
@@ -714,7 +722,7 @@ export const getUserFeed = async (req: Request, res: Response) => {
   try {
     decodificado = jwt.verify(token, CLAVE) as IJWTPayload;
   } catch (err) {
-    res.json({
+    res.status(401).json({
       msg: "Token no valido",
       err,
     });
