@@ -25,6 +25,17 @@ export const createUser = async (req: Request, res: Response) => {
     });
     return;
   }
+
+  const usernameRegex = /^[a-zA-Z0-9_]+$/;
+
+  if (!usernameRegex.test(username)) {
+    res.status(400).json({
+      msg: "El username no debe contener espacios ni caracteres especiales ni emojis ni terminar en caracteres de signos.",
+      codErr: 117,
+    });
+    return;
+  }
+
   const existe = await User.exists({ username: username });
   if (existe) {
     res.status(409).json({
