@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express, { NextFunction, Request, Response } from "express";
 import {
   acceptOrRejectFriendshipRequest,
@@ -19,6 +21,7 @@ import {
 import cors from "cors";
 import { conectarDB } from "./db/config";
 import { PORT } from "./config/config";
+
 const app = express();
 
 app.listen(PORT, () => {
