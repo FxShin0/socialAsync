@@ -149,7 +149,12 @@ Instalar dependencias:
 npm install
 ```
 
-Crear un archivo `.env` con las variables de entorno necesarias.
+Crear un archivo `.env` con las variables de entorno necesarias:
+> PORT=tu_port
+> 
+> CLAVE=tu_clave
+> 
+> MONGO_URI=tu_mongo_uri
 
 Iniciar el servidor de desarrollo:
 
