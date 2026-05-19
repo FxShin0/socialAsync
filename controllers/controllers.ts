@@ -795,7 +795,7 @@ export const getUsers = async (req: Request, res: Response) => {
   try {
     decodificado = jwt.verify(token, CLAVE) as IJWTPayload;
   } catch (err) {
-    res.json({
+    res.status(401).json({
       msg: "Token no valido",
       err,
     });
@@ -817,4 +817,146 @@ export const getUsers = async (req: Request, res: Response) => {
   }
 
   res.json({ searchList });
+};
+
+export const getProfileInfo = async (req: Request, res: Response) => {
+  let token = req.headers.authorization?.split(" ")[1];
+  let username = req.params.username as string;
+
+  if (!token || !username) {
+    res.status(400).json({
+      msg: "Campos insuficientes en solicitud",
+      codErr: 100,
+    });
+    return;
+  }
+
+  let decodificado: IJWTPayload | null = null;
+  try {
+    decodificado = jwt.verify(token, CLAVE) as IJWTPayload;
+  } catch (err) {
+    res.status(401).json({
+      msg: "Token no valido",
+      err,
+    });
+    return;
+  }
+
+  try {
+    const userPromise = User.findOne({
+      username,
+      estado: true,
+    }).select("username nombre");
+
+    const friendsCountPromise = Friendship.countDocuments({
+      estado: true,
+      $or: [{ emitterUsername: username }, { recieverUsername: username }],
+    });
+
+    const postsCountPromise = Post.countDocuments({
+      username,
+      estado: true,
+    });
+
+    const commentsCountPromise = Comment.countDocuments({
+      username,
+      estado: true,
+    });
+
+    const [user, friendsCount, postsCount, commentsCount] = await Promise.all([
+      userPromise,
+      friendsCountPromise,
+      postsCountPromise,
+      commentsCountPromise,
+    ]);
+
+    if (!user) {
+      res.status(404).json({
+        msg: "Usuario no encontrado",
+      });
+      return;
+    }
+
+    res.json({
+      username: user.username,
+      nombre: user.nombre,
+      friendsCount,
+      postsCount,
+      commentsCount,
+    });
+  } catch (err) {
+    res.status(500).json({
+      msg: "Error obteniendo informacion del perfil",
+      err,
+    });
+  }
+};
+
+export const getFriendRequestStatus = async (req: Request, res: Response) => {
+  let token = req.headers.authorization?.split(" ")[1];
+  let username = req.params.username as string;
+
+  if (!token || !username) {
+    res.status(400).json({
+      msg: "Campos insuficientes en solicitud",
+      codErr: 100,
+    });
+    return;
+  }
+
+  let decodificado: IJWTPayload | null = null;
+  try {
+    decodificado = jwt.verify(token, CLAVE) as IJWTPayload;
+  } catch (err) {
+    res.status(401).json({
+      msg: "Token no valido",
+      err,
+    });
+    return;
+  }
+
+  try {
+    const request = await Friendship.findOne({
+      $or: [
+        { emitterUsername: decodificado.username, recieverUsername: username },
+        { emitterUsername: username, recieverUsername: decodificado.username },
+      ],
+    });
+
+    if (!request) {
+      res.json({
+        estado: "inexistente",
+      });
+      return;
+    }
+
+    if (request.estado === false && request.isRejected === false) {
+      res.json({
+        estado: "pendiente",
+        friendRequest: request,
+      });
+      return;
+    }
+
+    if (request.isRejected) {
+      res.json({
+        estado: "rechazado",
+        friendRequest: request,
+      });
+      return;
+    }
+
+    if (request.estado === true) {
+      res.json({
+        estado: "amigos",
+      });
+      return;
+    }
+  } catch (err) {
+    res.status(500).json({
+      msg: "Error obteniendo informacion de amistad",
+      err,
+    });
+    return;
+  }
 };
