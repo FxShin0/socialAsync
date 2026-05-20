@@ -806,14 +806,14 @@ export const getUsers = async (req: Request, res: Response) => {
   if (!username)
     searchList = await User.find({
       username: { $nin: [decodificado.username] },
-    }).select("username");
+    }).select("username nombre");
   else {
     searchList = await User.find({
       $and: [
         { username: { $regex: username, $options: "i" } },
         { username: { $nin: [decodificado.username] } },
       ],
-    }).select("username");
+    }).select("username nombre");
   }
 
   res.json({ searchList });
