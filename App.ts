@@ -13,6 +13,7 @@ import {
   getFriendRequests,
   getFriendRequestStatus,
   getFriends,
+  getNewPosts,
   getProfileInfo,
   getUser,
   getUserFeed,
@@ -62,6 +63,7 @@ app.get("/feed", getUserFeed);
 app.get("/search", getUsers);
 app.get("/profileInfo/:username", getProfileInfo);
 app.get("/friend/requestStatus/:username", getFriendRequestStatus);
+app.get("/feed/newPosts/:createdAt", getNewPosts);
 
 //delete
 app.delete("/post/:postId", deletePost);

@@ -960,3 +960,65 @@ export const getFriendRequestStatus = async (req: Request, res: Response) => {
     return;
   }
 };
+
+export const getNewPosts = async (req: Request, res: Response) => {
+  let token = req.headers.authorization?.split(" ")[1];
+  let createdAt = req.params.createdAt;
+  let afterDate = new Date(createdAt as string);
+
+  if (!token) {
+    res.status(400).json({
+      msg: "Campos insuficientes en solicitud",
+      codErr: 100,
+    });
+    return;
+  }
+
+  if (isNaN(afterDate.getTime())) {
+    return res.status(400).json({
+      msg: "Fecha invalida",
+      codErr: 201,
+    });
+  }
+
+  let decodificado: IJWTPayload | null = null;
+  try {
+    decodificado = jwt.verify(token, CLAVE) as IJWTPayload;
+  } catch (err) {
+    res.status(401).json({
+      msg: "Token no valido",
+      err,
+    });
+    return;
+  }
+
+  let friendList = await Friendship.find({
+    $or: [
+      { emitterUsername: decodificado.username },
+      { recieverUsername: decodificado.username },
+    ],
+    isRejected: false,
+    estado: true,
+  }).select("emitterUsername recieverUsername");
+
+  let cleanFriendlist: string[];
+  cleanFriendlist = friendList.map((relation) => {
+    return relation.emitterUsername === decodificado.username
+      ? relation.recieverUsername
+      : relation.emitterUsername;
+  });
+
+  cleanFriendlist.push(decodificado.username);
+
+  const posts = await Post.find({
+    username: { $in: cleanFriendlist },
+    estado: true,
+    createdAt: {
+      $gt: afterDate,
+    },
+  }).sort({ createdAt: -1 });
+
+  res.json({
+    posts,
+  });
+};
